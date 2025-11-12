@@ -52,6 +52,10 @@ labyrinth-client/
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.
 
+## Codestyle
+
+See [CODESTYLE.md](CODESTYLE.md) for codestyle guidelines.
+
 ## Future Technology Stack
 
 - **Java 17**
