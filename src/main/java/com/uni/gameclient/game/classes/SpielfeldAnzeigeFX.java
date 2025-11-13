@@ -251,12 +251,8 @@ public class SpielfeldAnzeigeFX extends Region {
          String tilename= getTileImageName(tile);
          String bonusType="";
          bonusType= tile.getBonus().getType();
-
-
-
          String treasureName= "";
          treasureName= tile.getTreasure().getName();
-
          String pathTile = "/pieces/" + tilename;
          Image img_tile = null;
          try (InputStream in = getClass().getResourceAsStream(pathTile)) {
@@ -286,9 +282,9 @@ public class SpielfeldAnzeigeFX extends Region {
             }
         }catch (IOException e) {
         }
-
         return  overlayBonusTtreasure(img_tile, img_bonus, img_treasure);
     }
+
     private static Image overlayBonusTtreasure(Image tile, Image bonus, Image treasure) {
         double width = tile.getWidth();
         double height = tile.getHeight();

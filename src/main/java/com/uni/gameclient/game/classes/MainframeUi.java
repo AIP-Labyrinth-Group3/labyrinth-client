@@ -32,7 +32,6 @@ public class MainframeUi {
     //Rest GameServer Service
     private  Gameserverservice gameserverservice;
 
-
     // UI state
     private Stage stage;
     // Platzhalter für den Bereich inden die veschiedenen Ansichten rein sollen
@@ -58,6 +57,7 @@ public class MainframeUi {
     private GameBoard gameBoard;
     private VBox scoreboardBox;
     private SpielfeldAnzeigeFX spielfeldanzeige;
+    private SpielfeldAnzeigeFX2 spielfeldanzeige2;
 
 
     // dein Zustand
@@ -80,17 +80,16 @@ public class MainframeUi {
     }
 
 
-
-    public HBox spielpanelAnzeigen(Consumer<String> callback) {
-        // Inner panel (horizontal)
+    public HBox spielpanelAnzeigen2(Consumer<String> callback) {
         HBox hbox = new HBox(10); // spacing = 10px
-        // === Jetzt die Buttons ===
-        Button toggleViewBtn = new Button("toggle Fenster");
-        Button toggleBoardBtn = new Button("toggle Spielfeld");
-        Button message2 = new Button("Meldung 2");
-        HBox bottomControls = new HBox(8, toggleViewBtn, toggleBoardBtn, message2);
 
+        Button toggleViewBtn = new Button("toggle\n Fenster");
+        Button toggleBoardBtn = new Button("toggle\n Spielfeld");
+        Button message2      = new Button("Meldung 2");
+
+        HBox bottomControls = new HBox(8, toggleViewBtn, toggleBoardBtn, message2);
         bottomControls.setPadding(new Insets(8));
+
         toggleViewBtn.setOnAction(e -> toggleVisibleTile());
         toggleBoardBtn.setOnAction(e -> toggleBoardLayout());
 
@@ -99,17 +98,43 @@ public class MainframeUi {
             alert.setTitle("Information Message2");
             alert.setHeaderText("Operation Successful2");
             alert.setContentText("The data was killed successfully!");
+            alert.showAndWait();
+
+            if (callback != null) {
+                callback.accept("Button 2 wurde gedrückt");
+            }
+        });
+
+        hbox.getChildren().addAll(bottomControls);
+        return hbox;
+    }
+
+
+
+    public HBox spielpanelAnzeigen(     Consumer<String> callback) {
+        // Inner panel (horizontal)
+        HBox hbox = new HBox(20);
+        // === Jetzt die Buttons ===
+        Button toggleViewBtn = new Button("toggle\n Fenster");
+        Button toggleBoardBtn = new Button("toggle\n Spielfeld");
+        Button button_message2 = new Button("Meldung 2");
+        HBox bottomControls = new HBox(8, toggleViewBtn, toggleBoardBtn, button_message2);
+        bottomControls.setPadding(new Insets(8));
+
+        toggleViewBtn.setOnAction(e ->
+                toggleVisibleTile());
+        toggleBoardBtn.setOnAction(e -> toggleBoardLayout());
+        button_message2.setOnAction(e -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Information Message2");
+            alert.setHeaderText("Operation Successful2");
+            alert.setContentText("The data was killed successfully!");
             alert.showAndWait(); // Show and wait for user to close it
             // Sende Ergebnis an Elternkomponente
             callback.accept("Button 2 wurde gedrückt");
-
         });
-        hbox.getChildren().addAll(
-                toggleViewBtn,
-                toggleBoardBtn,
-                message2);
+        hbox.getChildren().addAll(bottomControls);
         return hbox;
-
     }
 
 
@@ -123,11 +148,7 @@ public class MainframeUi {
     }
 
     private void toggleBoardLayout() {
-        if (Visibletile == 0) {
-            Visibletile = 1;
-        } else {
-            Visibletile = 0;
-        }
+        gameBoard = GameBoard.generateBoard(gameBoard.getSize());
         updateVisibleTileContent();
     }
 
@@ -153,15 +174,15 @@ public class MainframeUi {
                 // Spielfeld anzeigen
                 if (spielfeldanzeige == null) {
                     if (gameBoard == null) {
-                        BoardSize boardSize = new BoardSize(7,7);
+                        BoardSize boardSize = new BoardSize(9,9);
                         gameBoard = GameBoard.generateBoard(boardSize);
                     }
 
 
                 }
-                spielfeldanzeige = new SpielfeldAnzeigeFX(gameBoard);
-                spielfeldanzeige.setPadding(new Insets(10));
-                viewContentBox.getChildren().add(spielfeldanzeige);
+                spielfeldanzeige2 = new SpielfeldAnzeigeFX2(gameBoard);
+                spielfeldanzeige2.setPadding(new Insets(10));
+                viewContentBox.getChildren().add(spielfeldanzeige2);
             }
         });
     }
@@ -305,9 +326,17 @@ public class MainframeUi {
                 }
             });
 
+
             HBox hbox_button_get_serverrest = new HBox(10, button_get_server, button_get_serverrest);
 
-            VBox vbox_server_discover = new VBox(10, hbox_button_get_serverrest, combo_available_server);
+            HBox control= spielpanelAnzeigen(msg -> {
+                Platform.runLater(() -> actionLog.appendText("[UI Callback] " + msg + "\n"));
+            });
+
+            VBox vbox_server_discover = new VBox(10);
+            vbox_server_discover.getChildren().addAll(control,hbox_button_get_serverrest, combo_available_server);
+
+
             vbox_server_discover.setAlignment(Pos.CENTER_LEFT);
             vbox_server_discover.setPadding(new Insets(8));
 
