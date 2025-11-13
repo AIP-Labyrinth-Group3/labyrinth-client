@@ -1,0 +1,152 @@
+@startuml
+title Domänenmodell – Das verrückte Labyrinth
+
+' ======================
+' Enumerationen
+' ======================
+enum ServerStatus {
+  LOBBY
+  IN_GAME
+  FINISHED
+}
+
+enum TileType {
+  STRAIGHT
+  CORNER
+  T_SHAPE
+}
+
+enum Orientation {
+  DEG_0
+  DEG_90
+  DEG_180
+  DEG_270
+}
+
+enum BonusType {
+  BEAM          ' Teleportation
+  PUSH_FIXED    ' Feste Gänge schieben
+  SWAP          ' Platztausch
+  PUSH_TWICE    ' Zweimal schieben
+}
+
+' ======================
+' Haupt-Domänenklassen
+' ======================
+
+class Verwaltungsserver {
+  +uri : String
+}
+
+class Spielserver {
+  +id : String
+  +name : String
+  +uri : String
+  +status : ServerStatus
+  +maxPlayers : int
+  +currentPlayerCount : int
+}
+
+class Spiel {
+  +id : String
+  +startTime : Date
+  +endTime : Date
+}
+
+class Board {
+  +rows : int
+  +cols : int
+}
+
+class Tile {
+  +tileId : int
+  +x : int
+  +y : int
+  +fixed : boolean
+  +type : TileType
+  +orientation : Orientation
+}
+
+class Treasure {
+  +treasureId : int
+  +name : String
+}
+
+class Bonus {
+  +bonusId : int
+  +type : BonusType
+}
+
+class Player {
+  +username : String
+  +x : int
+  +y : int
+  +treasuresCollected : int
+}
+
+class TreasureListItem {
+  +id : int
+  +collected : boolean
+}
+
+class BonusListItem {
+  +id : int
+  +activated : boolean
+}
+
+class ScoreboardEntry {
+  +username : String
+  +fieldCount : int
+  +pushCount : int
+  +blockerCount : int
+  +playedGames : int
+  +wonGames : int
+}
+
+class VictoryHistoryItem {
+  +id : int
+  +username : String
+  +date : Date
+}
+
+' ======================
+' Beziehungen
+' ======================
+
+' Verwaltungsserver verwaltet mehrere Spielserver
+Verwaltungsserver "1" o-- "0..*" Spielserver : registriert >
+
+' Spielserver hostet genau ein Spiel (pro Instanz)
+Spielserver "1" o-- "1" Spiel : hostet >
+
+' Ein Spiel besitzt genau ein Board
+Spiel "1" o-- "1" Board : verwendet >
+
+' Board besteht aus vielen Tiles
+Board "1" o-- "1..*" Tile : besteht aus >
+
+' Tile kann optional einen Treasure und/oder Bonus tragen
+Tile "0..1" o-- "1" Treasure : treasure >
+Tile "0..1" o-- "1" Bonus : bonus >
+
+' Ein Spiel hat mehrere Spieler (2..4)
+Spiel "1" o-- "2..4" Player : enthält >
+
+' Spieler haben Schatz- und Bonuslisten
+Player "1" o-- "0..*" TreasureListItem : treasureList >
+Player "1" o-- "0..*" BonusListItem : bonusList >
+
+' TreasureListItem referenziert einen Treasure-Typ
+TreasureListItem "1" --> "1" Treasure : treasure >
+
+' BonusListItem referenziert einen Bonus-Typ
+BonusListItem "1" --> "1" Bonus : bonus >
+
+' Scoreboard für ein Spiel, pro Spieler ein Eintrag
+Spiel "1" o-- "0..*" ScoreboardEntry : scoreboard >
+ScoreboardEntry "1" --> "1" Player : für >
+
+' Sieg-Historie des Spiels
+Spiel "1" o-- "0..*" VictoryHistoryItem : victoryHistory >
+
+@enduml
