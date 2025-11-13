@@ -8,6 +8,7 @@ public class Treasure {
         this.id = id;
         this.name = name;
         if(this.name == null){
+            this.id = 1;
             this.name = "UNKNOWN";
         }
     }

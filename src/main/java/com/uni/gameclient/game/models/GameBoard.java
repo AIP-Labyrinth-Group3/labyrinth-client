@@ -1,10 +1,12 @@
 package com.uni.gameclient.game.models;
 
+import com.sun.tools.javac.Main;
+
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
 
 public class GameBoard {
     private BoardSize size;
@@ -13,6 +15,7 @@ public class GameBoard {
     private GameBoard(BoardSize size) {
         this.size = size;
         this.tiles = new Tile[size.getRows()][size.getCols()];
+
     }
     public BoardSize getSize() {
         return size;
@@ -20,6 +23,8 @@ public class GameBoard {
     public Tile[][] getTiles() {
         return tiles;
     }
+
+
     public void setTile(int row, int col, Tile tile) {
         this.tiles[row][col] = tile;
     }
@@ -62,6 +67,19 @@ public class GameBoard {
 
         // Restliche Tiles zufällig füllen
         fillRandomTiles(board);
+        try{
+
+            System.out.println("Working dir: " + System.getProperty("user.dir"));
+
+            String pathBonus = System.getProperty("user.dir") + "/src/main/resources/treasure/treasure.txt";
+
+            List<String> lines = Files.readAllLines(Paths.get(pathBonus));
+
+            //SetTreasures(board, lines);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
         return board;
     }
 
@@ -189,7 +207,39 @@ public class GameBoard {
 
 }
 
+    private static void SetTreasures(GameBoard board, List<String> treasure) {
 
+        int number_field = board.size.getCols() * board.size.getRows();
+        Integer[] occupied_positions = new Integer[number_field];
+        for (int i = 0; i < occupied_positions.length; i++) {
+            occupied_positions[i] = 0;
+        }
+        int index=0;
+
+        int counttreasures = treasure.size();
+        Treasure [] treasures = new Treasure[counttreasures];
+
+        for(String str : treasure) {
+            int id =1;
+            treasures[id] = new Treasure(id, str);
+            occupied_positions[index++] = id++;
+        }
+
+
+        List<Integer> list = Arrays.asList(occupied_positions);
+        Collections.shuffle(list);
+        for (int i = 0; i < number_field; i++) {
+            int row = i / board.getSize().getCols();
+            int col = i % board.getSize().getCols();
+            if (list.get(i) != 1) {
+                Tile t = board.getTiles()[row][col];
+                if (t != null) {
+                    t.setTreasure(treasures[list.get(i)]);
+                    board.setTile(row,col,t);
+                }
+            }
+        }
+    }
 
     //DEMO 
     public static void printBoard(GameBoard board) {

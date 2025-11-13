@@ -1,0 +1,7 @@
+mario
+luigi
+peaches
+bowser
+
+
+

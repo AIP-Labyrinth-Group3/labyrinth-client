@@ -77,10 +77,6 @@ public class MainframeUi {
         this.actionClient = actionClient;
         this.broadcastClient = broadcastClient;
         this.gameserverservice = gameserverservice;
-
-
-
-
     }
 
 
